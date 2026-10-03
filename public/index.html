@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bio Beauty Nexus | AI-Powered Beauty & Hair Image Analysis</title>
+  <meta name="description" content="AI-powered beauty and hair analysis platform that evaluates visible, non-medical facial and strand characteristics to generate personalized skincare and hair care profiles.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><circle cx='12' cy='12' r='10'/></svg>">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" class="brand-logo" data-nav-target="home">
+        <div class="logo-symbol">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"></path>
+            <path d="M12 6V12L16 14"></path>
+            <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <span class="brand-name">Bio Beauty <span class="highlight">Nexus</span></span>
+      </a>
+
+      <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">☰</button>
+
+      <nav class="main-nav" id="navLinks">
+        <button type="button" class="nav-link nav-active" data-nav-target="home">Home</button>
+        <button type="button" class="nav-link" data-nav-target="scan">AI Beauty Scan</button>
+        <button type="button" class="nav-link" data-nav-target="results">Skin Profile</button>
+        <button type="button" class="nav-link" data-nav-target="hair_results">Hair Profile</button>
+        <button type="button" class="nav-link" data-nav-target="routine">Personalized Routine</button>
+        <button type="button" class="nav-link" data-nav-target="assistant">AI Assistant</button>
+        <button type="button" class="nav-link" data-nav-target="timeline">History</button>
+        <button type="button" class="nav-link" data-nav-target="questionnaire">Preferences</button>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" class="btn btn-secondary nav-auth-btn" id="navAuthBtn">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Sign In / Register</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Outlet -->
+  <main id="mainOutlet" class="app-container">
+    <!-- Rendered dynamically by BioBeautyNexusApp controller -->
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        Bio Beauty Nexus &copy; 2026 • AI Cosmetic Intelligence
+      </div>
+      <div class="footer-disclaimer">
+        <strong>Strict Safety Policy:</strong> Bio Beauty Nexus analyzes visible cosmetic features for aesthetic personalization and educational guidance only. It is NOT a medical device and does not diagnose, treat, prevent, or cure any skin disease, alopecia, or pathological condition. Consult a certified medical dermatologist or trichologist for clinical evaluations.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

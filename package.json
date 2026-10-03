@@ -1,0 +1,10 @@
+{
+  "name": "bio-beauty-nexus",
+  "version": "1.0.0",
+  "description": "Bio Beauty Nexus - AI-Powered Beauty Image Analysis Platform",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

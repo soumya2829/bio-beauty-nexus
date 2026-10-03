@@ -1,0 +1,151 @@
+{
+  "users": [
+    {
+      "id": "usr_demo_01",
+      "name": "Alex Chen",
+      "email": "alex.chen@biobeautynexus.io",
+      "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+      "skinType": "Combination",
+      "hairType": "Wavy / Medium Density",
+      "primaryGoal": "Radiance & Barrier Support",
+      "sensitivityLevel": "Mildly Sensitive",
+      "climate": "Temperate / Urban",
+      "createdAt": "2026-08-15T09:00:00Z"
+    }
+  ],
+  "ingredients": [
+    {
+      "id": "ing_hyaluronic",
+      "name": "Hyaluronic Acid (Multi-Molecular)",
+      "category": "Hydrator",
+      "benefits": "Deep multi-layer surface hydration, plumps appearance of dehydration lines, softens texture.",
+      "bestFor": ["Dryness", "Dehydration", "Dullness"],
+      "contraindications": "Apply to damp skin; lock with an emollient in dry climates.",
+      "isPrescription": false
+    },
+    {
+      "id": "ing_niacinamide",
+      "name": "Niacinamide (Vitamin B3 2-5%)",
+      "category": "Barrier & Tone Modulator",
+      "benefits": "Visibly refines pore appearance, harmonizes surface sebum, balances skin tone, supports barrier.",
+      "bestFor": ["Visible Pores", "Oiliness", "Uneven Complexion", "Mild Redness"],
+      "contraindications": "Avoid pairing at exact same step with high-strength pure L-Ascorbic Acid if prone to flushing.",
+      "isPrescription": false
+    },
+    {
+      "id": "ing_ceramides",
+      "name": "Ceramide Complex (NP, AP, EOP)",
+      "category": "Lipid Barrier Restorer",
+      "benefits": "Fortifies moisture barrier, visibly reduces flaky texture, protects against environmental stressors.",
+      "bestFor": ["Dryness", "Compromised Barrier", "Sensitivity", "Texture"],
+      "contraindications": "Suitable for daily morning and evening use.",
+      "isPrescription": false
+    },
+    {
+      "id": "ing_centella",
+      "name": "Centella Asiatica (Cica / Madecassoside)",
+      "category": "Botanical Soother",
+      "benefits": "Visibly calms superficial facial redness, comfort-enhancing botanical extract, reinforces moisture balance.",
+      "bestFor": ["Visible Redness", "Reactive Skin", "Sensitized Barrier"],
+      "contraindications": "Very gentle; suitable for daily soothing routines.",
+      "isPrescription": false
+    },
+    {
+      "id": "ing_rosemary",
+      "name": "Rosemary Leaf Extract & Peptide Complex",
+      "category": "Scalp Stimulator & Density Booster",
+      "benefits": "Botanical extract renowned for invigorating scalp circulation, supporting the visual appearance of follicle density and root resilience.",
+      "bestFor": ["Hair Density", "Scalp Vitality", "Fine Strands"],
+      "contraindications": "Massage into scalp nightly; cosmetic non-medical formulation.",
+      "isPrescription": false
+    },
+    {
+      "id": "ing_keratin",
+      "name": "Bio-Fermented Hydrolyzed Plant Keratin",
+      "category": "Cuticle Restorer",
+      "benefits": "Penetrates visual gaps in the hair cuticle, sealing in moisture, taming flyaways, and dramatically reducing frizz.",
+      "bestFor": ["Frizz", "Split Ends", "Dry Texture"],
+      "contraindications": "Use 1-2 times weekly in rinse-off masks.",
+      "isPrescription": false
+    },
+    {
+      "id": "ing_argan",
+      "name": "Cold-Pressed Organic Argan Oil",
+      "category": "Nutrient Lipid & Shine Elixir",
+      "benefits": "Rich in oleic and linoleic essential fatty acids; imparts reflective mirror-like gloss and protects hair fiber from environmental heat.",
+      "bestFor": ["Dullness", "Frizz", "Dry Ends"],
+      "contraindications": "Apply 1-2 drops to mid-lengths and ends.",
+      "isPrescription": false
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_01",
+      "name": "Bio-Adaptive Phyto Cleansing Milk",
+      "brand": "Nexus Labs",
+      "category": "Gentle Cleanser",
+      "keyIngredients": ["Centella Asiatica", "Ceramides", "Oat Beta-Glucan"],
+      "skinFit": "Dry to Sensitive",
+      "howToUse": "Massage 1-2 pumps onto damp skin morning and night.",
+      "price": "$34"
+    },
+    {
+      "id": "prod_04",
+      "name": "Bio-Regenerative Barrier Cream",
+      "brand": "Nexus Labs",
+      "category": "Rich Moisturizer",
+      "keyIngredients": ["Ceramide Complex", "Squalane", "Colloidal Oatmeal"],
+      "skinFit": "Dry to Normal",
+      "howToUse": "Warm between fingertips and smooth across face and neck.",
+      "price": "$58"
+    },
+    {
+      "id": "prod_hair_01",
+      "name": "Follicle-Bio Rosemary & Caffeine Scalp Tonic",
+      "brand": "Nexus Labs",
+      "category": "Scalp Serum",
+      "keyIngredients": ["Rosemary Leaf Extract", "Caffeine 3%", "Biotinyl Tripeptide"],
+      "skinFit": "All Hair & Scalp Types",
+      "howToUse": "Apply 1 dropper-full directly onto clean scalp in sectioned partings; massage for 2 minutes before bed.",
+      "price": "$48"
+    },
+    {
+      "id": "prod_hair_02",
+      "name": "Phyto-Keratin Deep Bond Recovery Hair Mask",
+      "brand": "Nexus Labs",
+      "category": "Intensive Mask",
+      "keyIngredients": ["Plant Keratin", "Murumuru Butter", "Panthenol"],
+      "skinFit": "Dry, Frizzy, or Heat-Treated Strands",
+      "howToUse": "Work generously through wet mid-lengths to ends after shampooing. Leave for 7-10 minutes before rinsing.",
+      "price": "$44"
+    },
+    {
+      "id": "prod_hair_03",
+      "name": "Mirror-Gloss Botanical Silk Argan Finishing Drops",
+      "brand": "Nexus Labs",
+      "category": "Leave-In Gloss Serum",
+      "keyIngredients": ["Argan Oil", "Camellia Seed", "Hemisqualane"],
+      "skinFit": "All Hair Types",
+      "howToUse": "Smooth 1-2 drops through damp or dry ends to eliminate frizz and impart high-gloss sheen.",
+      "price": "$36"
+    }
+  ],
+  "analysisHistory": [],
+  "hairAnalysisHistory": [
+    {
+      "id": "hair_scan_2026_09",
+      "date": "2026-09-18T11:20:00Z",
+      "monthLabel": "September 2026",
+      "overallScore": 75,
+      "summary": "Baseline hair analysis. Visible surface flyaways and mild strand dehydration along mid-lengths.",
+      "metrics": {
+        "hairDensity": { "score": 82, "observation": "Full, well-distributed density across crown and temples", "confidence": "90% AI Estimate" },
+        "hairTexture": { "score": 76, "observation": "Type 2 Wavy with slight cuticle irregularities", "confidence": "88% AI Estimate" },
+        "hairShine": { "score": 71, "observation": "Moderate light reflection, mild dryness along ends", "confidence": "85% AI Estimate" },
+        "scalpComfort": { "score": 74, "observation": "Balanced scalp appearance with minimal surface oiliness", "confidence": "89% AI Estimate" },
+        "frizzControl": { "score": 68, "observation": "Visible humidity-induced halo frizz and flyaways", "confidence": "87% AI Estimate" }
+      },
+      "keyRecommendations": "Incorporate weekly hydrolyzed keratin mask and rosemary scalp tonic."
+    }
+  ]
+}
