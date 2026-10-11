@@ -1,9 +1,10 @@
 export class AnalysisResults {
-  constructor({ analysisData, onRetake, onAskAssistant, onViewRecommendations }) {
+  constructor({ analysisData, onRetake, onAskAssistant, onViewRecommendations, onViewDietaryPlan }) {
     this.analysisData = analysisData;
     this.onRetake = onRetake;
     this.onAskAssistant = onAskAssistant;
     this.onViewRecommendations = onViewRecommendations;
+    this.onViewDietaryPlan = onViewDietaryPlan;
   }
 
   render() {
@@ -141,6 +142,11 @@ export class AnalysisResults {
           View Personalized Routine
         </button>
 
+        <button type="button" class="btn btn-secondary" id="btnGoToDietary">
+          <span class="mode-icon">🥗</span>
+          Dietary Nutrition Plan
+        </button>
+
         <button type="button" class="btn btn-secondary" id="btnAskAssistant">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -183,6 +189,13 @@ export class AnalysisResults {
     container.querySelector('#btnGoToRoutine').addEventListener('click', () => {
       if (this.onViewRecommendations) this.onViewRecommendations();
     });
+
+    const btnDietary = container.querySelector('#btnGoToDietary');
+    if (btnDietary) {
+      btnDietary.addEventListener('click', () => {
+        if (this.onViewDietaryPlan) this.onViewDietaryPlan();
+      });
+    }
 
     container.querySelector('#btnAskAssistant').addEventListener('click', () => {
       if (this.onAskAssistant) this.onAskAssistant();

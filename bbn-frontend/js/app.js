@@ -3,11 +3,13 @@ import { ImagePreview } from './components/ImagePreview.js';
 import { BeautyAnalysis } from './components/BeautyAnalysis.js';
 import { AnalysisResults } from './components/AnalysisResults.js';
 import { HairAnalysisResults } from './components/HairAnalysisResults.js';
+import { HairQuestionnaire } from './components/HairQuestionnaire.js';
 import { RecommendationEngine } from './components/RecommendationEngine.js';
 import { BeautyAssistant } from './components/BeautyAssistant.js';
 import { UserBeautyProfile } from './components/UserBeautyProfile.js';
 import { AnalysisTimeline } from './components/AnalysisTimeline.js';
 import { AuthModal } from './components/AuthModal.js';
+import { DietaryPlanView } from './components/DietaryPlanView.js';
 import { API } from './api.js';
 
 class BioBeautyNexusApp {
@@ -67,7 +69,6 @@ class BioBeautyNexusApp {
         <span class="logout-icon" title="Log Out">⏻</span>
       `;
       btnAuth.onclick = (e) => {
-        // If clicking on logout icon
         if (e.target.classList.contains('logout-icon')) {
           e.stopPropagation();
           API.logout();
@@ -129,6 +130,9 @@ class BioBeautyNexusApp {
       case 'scan':
         this.renderScanSection(mainOutlet);
         break;
+      case 'hair_quiz':
+        this.renderHairQuiz(mainOutlet);
+        break;
       case 'results':
         this.renderResults(mainOutlet);
         break;
@@ -137,6 +141,9 @@ class BioBeautyNexusApp {
         break;
       case 'routine':
         this.renderRoutine(mainOutlet);
+        break;
+      case 'diet':
+        this.renderDietaryPlan(mainOutlet);
         break;
       case 'assistant':
         this.renderAssistant(mainOutlet);
@@ -161,7 +168,7 @@ class BioBeautyNexusApp {
         <div class="hero-content">
           <div class="bio-badge">
             <span class="pulse-dot"></span>
-            NEXT-GEN BIOTECHNOLOGY BEAUTY
+            100% NATURAL BOTANICAL & BIOTECH BEAUTY
           </div>
           
           <h1 class="hero-title">
@@ -170,7 +177,7 @@ class BioBeautyNexusApp {
           </h1>
           
           <p class="hero-subtitle">
-            AI-powered beauty analysis and personalized skincare & hair insights. Decode visible cosmetic characteristics with non-medical precision and build your optimal daily rituals.
+            AI-powered beauty & hair analysis using pure natural ingredients. Decode visible characteristics with non-medical precision and build your optimal botanical daily rituals.
           </p>
 
           <div class="hero-cta-group">
@@ -183,28 +190,28 @@ class BioBeautyNexusApp {
                 <line x1="2" y1="12" x2="5" y2="12"></line>
                 <line x1="19" y1="12" x2="22" y2="12"></line>
               </svg>
-              Start Your AI Beauty Scan
+              Start AI Facial Scan
             </button>
 
-            <button type="button" class="btn btn-secondary" id="btnStartHairScanHero">
-              <span class="mode-icon">💇‍♀️</span>
-              Try AI Hair & Scalp Scan
+            <button type="button" class="btn btn-secondary btn-hero" id="btnLaunchHairQuizHero">
+              <span class="mode-icon">📝</span>
+              Hair Questionnaire Diagnostic
             </button>
           </div>
 
           <!-- Trust Badges -->
           <div class="hero-features-list">
             <div class="feature-badge">
-              <span class="badge-icon">✓</span>
-              <span>100% Non-Medical Cosmetic Analysis</span>
+              <span class="badge-icon">🌿</span>
+              <span>100% Natural Botanical Ingredients</span>
             </div>
             <div class="feature-badge">
-              <span class="badge-icon">✓</span>
-              <span>Facial Skin & Hair Dual Pipeline</span>
+              <span class="badge-icon">💇‍♀️</span>
+              <span>Hair Analysis by Questionnaire & Scan</span>
             </div>
             <div class="feature-badge">
-              <span class="badge-icon">✓</span>
-              <span>Member Account & Saved Progress</span>
+              <span class="badge-icon">🛡️</span>
+              <span>Strict Non-Medical Safety Standard</span>
             </div>
           </div>
         </div>
@@ -214,17 +221,17 @@ class BioBeautyNexusApp {
             <div class="hero-scanner-preview">
               <div class="scanner-sweep-line"></div>
               <div class="face-biometric-mesh"></div>
-              <div class="hero-overlay-tag top">FACIAL COMPLEXION ANALYSIS</div>
-              <div class="hero-overlay-tag bottom">AI ESTIMATE • 7 DIMENSIONS</div>
+              <div class="hero-overlay-tag top">NATURAL INGREDIENTS DATABASE</div>
+              <div class="hero-overlay-tag bottom">HAIR QUESTIONNAIRE & OPTICAL SCAN</div>
             </div>
             <div class="hero-scanner-footer">
               <div class="metric-quick-stat">
-                <span class="stat-num">94%</span>
-                <span class="stat-lbl">Optical Clarity</span>
+                <span class="stat-num">100%</span>
+                <span class="stat-lbl">Botanical Ingredients</span>
               </div>
               <div class="metric-quick-stat">
-                <span class="stat-num">0%</span>
-                <span class="stat-lbl">Medical Claims</span>
+                <span class="stat-num">8-Step</span>
+                <span class="stat-lbl">Hair Questionnaire</span>
               </div>
               <div class="metric-quick-stat">
                 <span class="stat-num">Dual</span>
@@ -238,9 +245,9 @@ class BioBeautyNexusApp {
       <!-- Dual Analysis Hub Cards -->
       <section class="dual-features-section">
         <div class="section-heading text-center">
-          <div class="bio-badge">TWO SPECIALIZED OPTICAL PIPELINES</div>
+          <div class="bio-badge">TWO DIAGNOSTIC PATHWAYS</div>
           <h2>Comprehensive Bio-Cosmetic Diagnostics</h2>
-          <p>Choose between full facial skin profiling or targeted hair and scalp analysis.</p>
+          <p>Choose between full facial skin profiling or our in-depth hair & scalp diagnostic questionnaire.</p>
         </div>
 
         <div class="dual-cards-grid">
@@ -248,14 +255,14 @@ class BioBeautyNexusApp {
             <div class="dual-icon">✨</div>
             <h3>Facial Skin Analysis</h3>
             <p>Assesses 7 visible dimensions: skin appearance, micro-relief texture, hydration sheen, vascular redness, dark spots, under-eye contours, and pore visibility.</p>
-            <button type="button" class="btn btn-primary" id="btnLaunchSkinScan">Scan Facial Skin</button>
+            <button type="button" class="btn btn-primary" id="btnLaunchSkinScan">Start Facial Skin Scan</button>
           </div>
 
-          <div class="dual-card glass-panel">
+          <div class="dual-card glass-panel natural-border">
             <div class="dual-icon">💇‍♀️</div>
-            <h3>Hair & Scalp Analysis</h3>
-            <p>Analyzes strand texture, curl/wave pattern classification, cuticle alignment, halo frizz, and visible scalp parting comfort without clinical claims.</p>
-            <button type="button" class="btn btn-secondary" id="btnLaunchHairScan">Scan Hair & Scalp</button>
+            <h3>Hair Analysis by Questionnaire</h3>
+            <p>Answer 8 quick questions on your hair pattern, strand thickness, density, porosity, and scalp balance to receive a 100% natural botanical routine (Amla, Rosemary, Argan, Rice Water).</p>
+            <button type="button" class="btn btn-primary" id="btnLaunchHairQuiz">Take Hair Questionnaire</button>
           </div>
         </div>
       </section>
@@ -265,36 +272,36 @@ class BioBeautyNexusApp {
         <div class="section-heading text-center">
           <div class="bio-badge">STEP-BY-STEP PROCESS</div>
           <h2>How It Works</h2>
-          <p>Four effortless steps from a simple selfie to a customized, bio-compatible beauty routine.</p>
+          <p>Four effortless steps to a customized, 100% botanical skincare and hair care routine.</p>
         </div>
 
         <div class="steps-grid">
           <div class="step-card glass-panel">
             <div class="step-number-circle">1</div>
             <div class="step-icon-box">📸</div>
-            <h3>Upload Your Photo</h3>
-            <p>Take a well-lit photo with your camera or select one of our calibrated test presets.</p>
+            <h3>Upload or Answer Quiz</h3>
+            <p>Upload a photo or complete the 8-step hair questionnaire.</p>
           </div>
 
           <div class="step-card glass-panel">
             <div class="step-number-circle">2</div>
-            <div class="step-icon-box">⚡</div>
-            <h3>AI Analyzes Visible Characteristics</h3>
-            <p>Evaluates visible texture, hydration, redness, pores, or hair cuticle alignment.</p>
+            <div class="step-icon-box">🌿</div>
+            <h3>Match Natural Actives</h3>
+            <p>Evaluates characteristics against pure botanical ingredients in our database.</p>
           </div>
 
           <div class="step-card glass-panel">
             <div class="step-number-circle">3</div>
             <div class="step-icon-box">📊</div>
             <h3>Get Your Bio Profile</h3>
-            <p>Receive your personalized cosmetic profile with AI confidence estimates.</p>
+            <p>Receive your personalized profile with AI estimates and explanations.</p>
           </div>
 
           <div class="step-card glass-panel">
             <div class="step-number-circle">4</div>
-            <div class="step-icon-box">🌿</div>
-            <h3>Build Your Rituals</h3>
-            <p>Unlock morning, evening, weekly routines and targeted active ingredients.</p>
+            <div class="step-icon-box">🧴</div>
+            <h3>Build Natural Rituals</h3>
+            <p>Follow tailored pre-wash, wash day, and daily leave-in routines.</p>
           </div>
         </div>
       </section>
@@ -320,10 +327,8 @@ class BioBeautyNexusApp {
       this.navigateTo('scan');
     });
 
-    homeSection.querySelector('#btnStartHairScanHero').addEventListener('click', () => {
-      this.scanType = 'hair';
-      this.scanPhase = 'upload';
-      this.navigateTo('scan');
+    homeSection.querySelector('#btnLaunchHairQuizHero').addEventListener('click', () => {
+      this.navigateTo('hair_quiz');
     });
 
     homeSection.querySelector('#btnLaunchSkinScan').addEventListener('click', () => {
@@ -332,22 +337,24 @@ class BioBeautyNexusApp {
       this.navigateTo('scan');
     });
 
-    homeSection.querySelector('#btnLaunchHairScan').addEventListener('click', () => {
-      this.scanType = 'hair';
-      this.scanPhase = 'upload';
-      this.navigateTo('scan');
+    homeSection.querySelector('#btnLaunchHairQuiz').addEventListener('click', () => {
+      this.navigateTo('hair_quiz');
     });
 
     container.appendChild(homeSection);
   }
 
   renderScanSection(container) {
+    container.innerHTML = '';
     const scanWrapper = document.createElement('div');
     scanWrapper.className = 'scan-page-wrapper';
 
     if (this.scanPhase === 'upload') {
       const uploadComp = new ImageUpload({
         initialMode: this.scanType,
+        onOpenHairQuiz: () => {
+          this.navigateTo('hair_quiz');
+        },
         onImageSelected: (imageState) => {
           this.selectedImage = imageState;
           this.scanType = imageState.scanType || this.scanType;
@@ -395,18 +402,21 @@ class BioBeautyNexusApp {
             ${this.scanErrorMessage || 'The image appears blurred, underexposed, or does not clearly show features. Please upload a clear photo taken in natural ambient light.'}
           </p>
           <div class="error-tips">
-            <strong>Photo Quality Tips:</strong>
-            <ul>
-              <li>Face natural light directly without harsh shadows.</li>
-              <li>Hold your camera steady at eye level.</li>
-              <li>Wipe your camera lens to remove smudges.</li>
-            </ul>
+            <strong>Alternative:</strong> You can skip the photo and take our comprehensive <strong>Hair & Scalp Questionnaire</strong> instead!
           </div>
-          <button type="button" class="btn btn-primary" id="btnTryAgain">
-            Try Again With Another Photo
-          </button>
+          <div style="display: flex; gap: 12px; justify-content: center;">
+            <button type="button" class="btn btn-primary" id="btnTryHairQuizError">
+              Take Hair Questionnaire
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnTryAgain">
+              Try Another Photo
+            </button>
+          </div>
         </div>
       `;
+      scanWrapper.querySelector('#btnTryHairQuizError').addEventListener('click', () => {
+        this.navigateTo('hair_quiz');
+      });
       scanWrapper.querySelector('#btnTryAgain').addEventListener('click', () => {
         this.scanErrorMessage = null;
         this.scanPhase = 'upload';
@@ -415,6 +425,16 @@ class BioBeautyNexusApp {
     }
 
     container.appendChild(scanWrapper);
+  }
+
+  renderHairQuiz(container) {
+    const quizComp = new HairQuestionnaire({
+      onAnalysisComplete: (result) => {
+        this.currentHairAnalysis = result;
+        this.navigateTo('hair_results');
+      }
+    });
+    container.appendChild(quizComp.render());
   }
 
   async startAnalysis(container) {
@@ -495,6 +515,9 @@ class BioBeautyNexusApp {
       },
       onViewRecommendations: () => {
         this.navigateTo('routine');
+      },
+      onViewDietaryPlan: () => {
+        this.navigateTo('diet');
       }
     });
 
@@ -507,12 +530,20 @@ class BioBeautyNexusApp {
         <div class="empty-state-card glass-panel fade-in">
           <div class="empty-icon">💇‍♀️</div>
           <h2>No Hair Analysis Performed Yet</h2>
-          <p>Capture or upload a hair/scalp photo to generate your personalized Bio Hair Profile and custom routine.</p>
-          <button type="button" class="btn btn-primary" id="btnGoToHairScanEmpty">
-            Start Hair & Scalp Scan
-          </button>
+          <p>Answer our 8-step Hair Questionnaire or upload a hair/scalp photo to generate your personalized Bio Hair Profile and 100% natural botanical routine.</p>
+          <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px;">
+            <button type="button" class="btn btn-primary" id="btnGoToHairQuizEmpty">
+              Take Hair Questionnaire
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnGoToHairScanEmpty">
+              Camera Hair Scan
+            </button>
+          </div>
         </div>
       `;
+      container.querySelector('#btnGoToHairQuizEmpty').addEventListener('click', () => {
+        this.navigateTo('hair_quiz');
+      });
       container.querySelector('#btnGoToHairScanEmpty').addEventListener('click', () => {
         this.scanType = 'hair';
         this.scanPhase = 'upload';
@@ -523,6 +554,9 @@ class BioBeautyNexusApp {
 
     const hairComp = new HairAnalysisResults({
       hairData: this.currentHairAnalysis,
+      onOpenQuestionnaire: () => {
+        this.navigateTo('hair_quiz');
+      },
       onRetake: () => {
         this.scanType = 'hair';
         this.scanPhase = 'upload';
@@ -532,7 +566,10 @@ class BioBeautyNexusApp {
         this.navigateTo('assistant');
       },
       onViewRoutine: () => {
-        // Scroll down in current view
+        this.navigateTo('routine');
+      },
+      onViewDietaryPlan: () => {
+        this.navigateTo('diet');
       }
     });
 
@@ -544,17 +581,25 @@ class BioBeautyNexusApp {
       container.innerHTML = `
         <div class="empty-state-card glass-panel fade-in">
           <div class="empty-icon">🧴</div>
-          <h2>Routine Generator Locked</h2>
-          <p>Your personalized routine is generated directly from your AI Beauty Scan and questionnaire preferences.</p>
-          <button type="button" class="btn btn-primary" id="btnGoScanForRoutine">
-            Start AI Beauty Scan
-          </button>
+          <h2>Routine Generator Ready</h2>
+          <p>Complete an AI Beauty Scan or explore our proposed whole-food beauty routines and products.</p>
+          <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px;">
+            <button type="button" class="btn btn-primary" id="btnGoScanForRoutine">
+              Start AI Beauty Scan
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnGoDietFromLockedRoutine">
+              🥗 View Dietary Nutrition Plan
+            </button>
+          </div>
         </div>
       `;
       container.querySelector('#btnGoScanForRoutine').addEventListener('click', () => {
         this.scanType = 'skin';
         this.scanPhase = 'upload';
         this.navigateTo('scan');
+      });
+      container.querySelector('#btnGoDietFromLockedRoutine').addEventListener('click', () => {
+        this.navigateTo('diet');
       });
       return;
     }
@@ -564,10 +609,31 @@ class BioBeautyNexusApp {
       questionnaire: this.userProfile,
       onAskAboutRoutine: () => {
         this.navigateTo('assistant');
+      },
+      onViewDietaryPlan: () => {
+        this.navigateTo('diet');
       }
     });
 
     container.appendChild(recComp.render());
+  }
+
+  renderDietaryPlan(container) {
+    const activePlan = this.currentAnalysis?.recommendations?.dietaryPlan 
+      || this.currentHairAnalysis?.recommendations?.dietaryPlan 
+      || null;
+
+    const dietComp = new DietaryPlanView({
+      contextPlan: activePlan,
+      activePlanId: activePlan?.id || null,
+      onAskAssistant: () => {
+        this.navigateTo('assistant');
+      }
+    });
+
+    dietComp.render().then(elem => {
+      container.appendChild(elem);
+    });
   }
 
   renderAssistant(container) {

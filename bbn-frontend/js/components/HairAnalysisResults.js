@@ -1,9 +1,11 @@
 export class HairAnalysisResults {
-  constructor({ hairData, onRetake, onAskAssistant, onViewRoutine }) {
+  constructor({ hairData, onRetake, onAskAssistant, onViewRoutine, onOpenQuestionnaire, onViewDietaryPlan }) {
     this.hairData = hairData;
     this.onRetake = onRetake;
     this.onAskAssistant = onAskAssistant;
     this.onViewRoutine = onViewRoutine;
+    this.onOpenQuestionnaire = onOpenQuestionnaire;
+    this.onViewDietaryPlan = onViewDietaryPlan;
   }
 
   render() {
@@ -14,6 +16,7 @@ export class HairAnalysisResults {
       overallScore,
       hairTypeLabel,
       primaryCharacteristic,
+      analysisType = 'optical',
       categories = [],
       recommendations,
       disclaimer,
@@ -25,6 +28,8 @@ export class HairAnalysisResults {
       day: 'numeric',
       year: 'numeric'
     });
+
+    const isQuiz = analysisType === 'questionnaire';
 
     const radius = 42;
     const circumference = 2 * Math.PI * radius;
@@ -64,7 +69,7 @@ export class HairAnalysisResults {
             </div>
 
             <div class="cat-approach-block">
-              <span class="block-title">Suggested Hair & Scalp Approach</span>
+              <span class="block-title">Suggested Botanical Care Approach</span>
               <p class="approach-text text-hair">${cat.suggestedApproach}</p>
             </div>
 
@@ -104,16 +109,19 @@ export class HairAnalysisResults {
     `).join('');
 
     const ingredientsHtml = (recommendations?.ingredientSuggestions || []).map(ing => `
-      <div class="ingredient-card glass-panel">
+      <div class="ingredient-card glass-panel natural-ingredient-card">
         <div class="ing-header">
           <span class="ing-icon">🌿</span>
           <div>
+            <div class="natural-tag">100% NATURAL BOTANICAL</div>
             <h4 class="ing-name">${ing.name}</h4>
             <span class="ing-role">${ing.role}</span>
           </div>
         </div>
         <p class="ing-why">${ing.why}</p>
-        <span class="ing-safe-tag">Botanical Cosmetic Active</span>
+        <div class="ing-safe-tag natural-safe-tag">
+          <span>🌱 ${ing.origin || 'Pure Plant Botanical'}</span>
+        </div>
       </div>
     `).join('');
 
@@ -121,13 +129,13 @@ export class HairAnalysisResults {
       <!-- Top Title Header -->
       <div class="results-header glass-panel">
         <div class="results-header-left">
-          <div class="bio-badge">
-            <span class="pulse-dot"></span>
-            BIO HAIR PROFILE • GENERATED ${formattedDate}
+          <div class="bio-badge hair-badge">
+            <span class="pulse-dot hair-pulse-dot"></span>
+            ${isQuiz ? 'HAIR QUESTIONNAIRE DIAGNOSTIC' : 'BIO HAIR OPTICAL SCAN'} • GENERATED ${formattedDate}
           </div>
           <h1 class="results-main-title">Your Bio Hair & Scalp Profile</h1>
           <p class="results-lead-desc">
-            ${primaryCharacteristic}. Below are your non-medical cosmetic strand and scalp observations.
+            ${primaryCharacteristic}. Below are your non-medical cosmetic strand and scalp observations paired with 100% natural botanical ingredients from our database.
           </p>
           
           <div class="facial-attributes-row">
@@ -137,9 +145,14 @@ export class HairAnalysisResults {
               <strong>${hairTypeLabel || 'Type 2 Wavy'}</strong>
             </div>
             <div class="attribute-pill">
-              <span class="attr-icon">✨</span>
-              <span class="attr-label">Cuticle Focus:</span>
-              <strong>Porosity & Shine Balance</strong>
+              <span class="attr-icon">🌿</span>
+              <span class="attr-label">Protocol:</span>
+              <strong>100% Natural Botanical Care</strong>
+            </div>
+            <div class="attribute-pill">
+              <span class="attr-icon">📝</span>
+              <span class="attr-label">Method:</span>
+              <strong>${isQuiz ? 'Comprehensive Questionnaire' : 'Optical Image Analysis'}</strong>
             </div>
           </div>
         </div>
@@ -162,6 +175,16 @@ export class HairAnalysisResults {
 
       <!-- Action Navigation Toolbar -->
       <div class="results-action-bar">
+        <button type="button" class="btn btn-primary" id="btnRetakeHairQuiz">
+          <span class="mode-icon">📝</span>
+          ${isQuiz ? 'Retake Hair Questionnaire' : 'Refine via Hair Questionnaire'}
+        </button>
+
+        <button type="button" class="btn btn-secondary" id="btnViewHairDiet">
+          <span class="mode-icon">🥗</span>
+          Hair Follicle Dietary Plan
+        </button>
+
         <button type="button" class="btn btn-secondary" id="btnAskAssistantHair">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -174,7 +197,7 @@ export class HairAnalysisResults {
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             <path d="m9 11 3 3L22 4"></path>
           </svg>
-          New Hair Scan
+          Camera Hair Scan
         </button>
       </div>
 
@@ -188,9 +211,48 @@ export class HairAnalysisResults {
         ${categoryCardsHtml}
       </div>
 
+      <!-- Proposed Database Hair Products -->
+      ${(recommendations?.proposedProducts && recommendations.proposedProducts.length > 0) ? `
+        <div class="rec-section-box" style="margin-top: 16px;">
+          <div class="rec-section-header">
+            <div class="bio-badge hair-badge">NEXUS NATURALS DATABASE</div>
+            <h3>Proposed Botanical Hair Formulations</h3>
+            <span>100% pure plant botanicals matched from our clean database</span>
+          </div>
+          <div class="proposed-products-grid">
+            ${recommendations.proposedProducts.map(p => `
+              <div class="proposed-prod-card glass-panel">
+                <div class="prod-badge-row">
+                  <span class="bio-badge hair-badge">${p.brand || 'Nexus Naturals'}</span>
+                  <span class="prod-price-tag">${p.price || '$36'}</span>
+                </div>
+                <h4 class="prod-title">${p.name}</h4>
+                <span class="prod-cat">${p.category}</span>
+                <div class="prod-ingredients-list">
+                  <strong>Botanicals:</strong> ${(p.keyIngredients || []).join(' • ')}
+                </div>
+                <p class="prod-usage"><strong>How to Use:</strong> ${p.howToUse}</p>
+                <div class="prod-fit-tag">✓ Ideal for: ${p.skinFit}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- 100% Natural Botanical Active Ingredients -->
+      <div class="rec-section-box" style="margin-top: 16px;">
+        <div class="rec-section-header">
+          <h3>🌿 100% Natural Botanical Active Ingredients</h3>
+          <span>Derived from pure herbal extracts, plant cold-pressings, and bio-fermented waters</span>
+        </div>
+        <div class="ingredients-cards-grid">
+          ${ingredientsHtml}
+        </div>
+      </div>
+
       <!-- Tailored Hair Care Protocol -->
       <div class="results-section-title" style="margin-top: 24px;">
-        <h2>Tailored Hair & Scalp Routine</h2>
+        <h2>Tailored Botanical Hair Care Ritual</h2>
         <span class="section-badge">Wash Day & Daily Care</span>
       </div>
 
@@ -222,17 +284,6 @@ export class HairAnalysisResults {
         </div>
       </div>
 
-      <!-- Star Hair Actives -->
-      <div class="rec-section-box">
-        <div class="rec-section-header">
-          <h3>Key Hair & Scalp Botanical Actives</h3>
-          <span>Ingredients selected for follicle vitality and cuticle smoothing</span>
-        </div>
-        <div class="ingredients-cards-grid">
-          ${ingredientsHtml}
-        </div>
-      </div>
-
       <!-- Safety Disclaimer -->
       <div class="safety-advisory-banner results-disclaimer">
         <svg class="advisory-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -245,6 +296,17 @@ export class HairAnalysisResults {
         </div>
       </div>
     `;
+
+    container.querySelector('#btnRetakeHairQuiz').addEventListener('click', () => {
+      if (this.onOpenQuestionnaire) this.onOpenQuestionnaire();
+    });
+
+    const btnDiet = container.querySelector('#btnViewHairDiet');
+    if (btnDiet) {
+      btnDiet.addEventListener('click', () => {
+        if (this.onViewDietaryPlan) this.onViewDietaryPlan();
+      });
+    }
 
     container.querySelector('#btnAskAssistantHair').addEventListener('click', () => {
       if (this.onAskAssistant) this.onAskAssistant();

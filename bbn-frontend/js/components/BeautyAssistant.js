@@ -39,6 +39,12 @@ export class BeautyAssistant {
             <button class="prompt-chip" data-prompt="Build me a morning routine.">
               “Build me a morning routine.”
             </button>
+            <button class="prompt-chip" data-prompt="What dietary plan should I follow?">
+              “What dietary plan should I follow?”
+            </button>
+            <button class="prompt-chip" data-prompt="Which database products are in my routine?">
+              “Which database products are in my routine?”
+            </button>
             <button class="prompt-chip" data-prompt="Which ingredients should I look for?">
               “Which ingredients should I look for?”
             </button>

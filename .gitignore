@@ -1,0 +1,16 @@
+# Private database
+data/database.json
+
+# Dependencies and environments
+node_modules/
+**/node_modules/
+**/venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build files
+**/target/
+**/__pycache__/

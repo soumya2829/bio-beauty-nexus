@@ -1,157 +1,69 @@
-# 🌿 Bio Beauty Nexus - AI-Powered Beauty Image Analysis Platform
+# 🌿 Bio Beauty Nexus - AI Beauty & 100% Natural Hair Analysis Platform
 
-An advanced, biotechnology-inspired web application for non-medical cosmetic facial analysis, personalized skincare routine generation, and interactive AI beauty guidance.
+An advanced, biotechnology-inspired web application for non-medical cosmetic facial analysis, natural hair & scalp diagnostics, and personalized botanical routine generation.
 
 ---
 
-## 🌟 Core Features
+## 🌟 Core Capabilities
 
-1. **AI Beauty Scan**:
-   - **Upload Image**: Drag-and-drop or select any clear selfie (JPEG, PNG, WEBP).
-   - **Camera Capture**: Live webcam/smartphone camera capture with interactive face-alignment oval guide.
-   - **Demo Presets**: Instant one-click test cases (Balanced Radiance, Visible Dryness, Oily T-Zone, Rosy/Redness, and Poor Image Quality Safety Rejection test).
-   - **Facial Scan Animation**: Real-time holographic scan beam, biometric facial landmarks, and progressive telemetry indicators.
+### 1. 🌿 100% Natural Botanical Ingredients Database
+The platform features an enriched encyclopedia of pure plant-derived, cold-pressed, and bio-fermented ingredients:
+- **Rosemary Leaf Extract & Oil**: Scalp circulation stimulant, root densifier, and follicle revitalizer.
+- **Organic Amla (Indian Gooseberry)**: Vitamin C and plant tannin powerhouse for hair shaft strength and pigment lustre.
+- **Bhringraj ('King of Hair')**: Ancient Ayurvedic botanical for root nourishment and soothing scalp irritation.
+- **Cold-Pressed Virgin Argan Oil**: Rich in oleic and linoleic essential fatty acids; provides an anti-humidity mirror seal.
+- **Golden Cold-Pressed Jojoba Oil**: Biomimetic liquid wax that balances sebum and dissolves root buildup.
+- **Fermented Rice Water (Inositol)**: Bio-fermented amino acids that penetrate hair cuticles to boost tensile strength.
+- **Organic Aloe Vera Leaf Juice (99% Pure Inner Fillet)**: Natural enzymes and acemannan polysaccharides that soothe dry flakes.
+- **Wild Hibiscus Flower Extract**: Natural AHAs and plant mucilage that restore bounce, detangle, and tighten cuticles.
+- **Australian Tea Tree Hydrosol**: Purifies roots, balances sebum, and alleviates dandruff appearance.
+- **Centella Asiatica (Cica)**, **Colloidal Oatmeal**, **Cold-Pressed Rosehip Seed Oil**, and **100% Olive-Derived Plant Squalane**.
 
-2. **Visible Non-Medical Characteristics Analyzed**:
-   - **Skin Appearance** (radiance, clarity, vitality)
-   - **Visible Skin Texture** (micro-relief, smoothness)
-   - **Hydration Appearance** (moisture sheen, visible dryness/flakiness)
-   - **Visible Redness** (superficial flush, rosy hue across cheeks & nose)
-   - **Visible Dark-Spot Appearance** (tone uniformity, cosmetic contrast)
-   - **Visible Under-Eye Appearance** (shadows, orbital contour)
-   - **Visible Pores** (follicular aperture visibility across T-zone)
-   - **Face Shape & Hair Appearance**
+### 2. 💇‍♀️ Hair Analysis via 8-Step Diagnostic Questionnaire
+Users can analyze their hair without a camera by answering 8 targeted questions:
+1. **Natural Hair Pattern** (Type 1 Straight, Type 2 Wavy, Type 3 Curly, Type 4 Coily)
+2. **Strand Thickness** (Fine, Medium, Coarse / Thick)
+3. **Hair Density** (Low, Medium, High / Dense)
+4. **Scalp Condition** (Balanced & Comfortable, Oily, Dry & Tight, Sensitive)
+5. **Hair Porosity** (Low Porosity, Medium Porosity, High Porosity)
+6. **Primary Goal** (Frizz Control & Shine, Root Density, Deep Moisture, Scalp Clarification)
+7. **Chemical / Thermal Processing** (Virgin, Color-Treated, Frequent Heat Styling, Chemically Straightened)
+8. **Wash Frequency** (Daily, 2–3 Times/Week, Weekly or Less)
 
-3. **Results UI - “Your Bio Beauty Profile”**:
-   - Overall Bio Beauty Score with circular SVG gauge indicators.
-   - Breakdown for all 7 cosmetic categories showing:
-     - **Observation**
-     - **Confidence Level** (clearly marked as AI estimates)
-     - **Simple Explanation**
-     - **Suggested Beauty-Care Approach**
+**Outputs:**
+- 5 Dimension Breakdown:
+  1. *Hair Density & Root Vitality*
+  2. *Pattern & Fiber Micro-Relief*
+  3. *Moisture Lustre & Cuticle Porosity*
+  4. *Scalp Barrier Comfort*
+  5. *Frizz Index & Cuticle Alignment*
+- **3-Phase Tailored Botanical Ritual**:
+  - *Phase 1: Pre-Wash Botanical Scalp & Oil Massage* (Warm herbal oils)
+  - *Phase 2: Gentle Botanical Cleanse & Deep Plant Mask* (Clarification + bond repair)
+  - *Phase 3: Daily Post-Wash Cuticle Sealing* (Weightless silk finishing drops)
 
-4. **Personalized Skincare Recommendations**:
-   - **Morning Defense Routine** (Step-by-step: Cleanser, Hydrating Essence, Targeted Serum, Mineral SPF 50+)
-   - **Evening Recovery Routine** (Double cleanse, orbital eye care, ceramide barrier restoration)
-   - **Weekly Rhythm** (Enzymatic masks, deep moisture recovery treatments)
-   - **Ingredient Suggestions** (Multi-molecular Hyaluronic Acid, Ceramides, Centella Asiatica, Niacinamide, Squalane)
-   - **Product Category Guide**
+### 3. ✨ AI Optical Face & Hair Scan
+- Upload or live camera capture with real-time biometric alignment overlays.
+- Real-time laser scanning animation with telemetry indicators.
+- Instant calibrated demo presets for rapid demonstration.
 
-5. **AI Beauty Assistant**:
-   - Interactive chat interface with quick action prompt chips:
-     - *“What does my analysis mean?”*
-     - *“Build me a morning routine.”*
-     - *“Which ingredients should I look for?”*
-     - *“Explain my skin texture result.”*
-     - *“How can I improve my beauty routine?”*
-   - Free-form conversation contextually grounded in the user's latest scan results.
-
-6. **Analysis History & Timeline Comparison**:
-   - Monthly progression timeline (e.g., September 2026 → October 2026 → November 2026).
-   - Side-by-side cosmetic trend indicators without claiming medical improvement.
-
-7. **Skincare Questionnaire Integration**:
-   - Skin type, primary goals, sensitivity level, age group, climate, and lifestyle factors saved and factored into recommendations.
+### 4. 👤 Member Accounts & Authentication
+- User Registration and Sign-In modal with session state.
+- Longitudinal history timeline (September 2026 → October 2026 → November 2026).
 
 ---
 
 ## 🛡️ Medical Safety & Compliance
 
-- **Cosmetic Observations Only**: Strictly avoids medical, dermatological, or disease diagnoses.
-- **No Diagnostic Claims**: Results are labeled as cosmetic AI estimates.
-- **No Prescription Recommendations**: Exclusively suggests cosmetic products and over-the-counter skincare actives.
-- **Image Quality Filtering**: Flags blurred or underexposed images with clear photography guidance.
+- **Strict Non-Medical Standard**: Cosmetic observations only. Does not diagnose diseases, medical scalp pathologies, alopecia, or hormonal disorders.
+- **No Prescription Medications**: Recommends pure botanical cosmetic oils, herbal rinses, and gentle conditioning rituals.
 
 ---
 
-## 🚀 Getting Started
-
-### Method 1: Run with Node.js Server (Recommended)
-The built-in Node server has **zero external npm dependencies** (uses Node.js built-in `http`, `fs`, `path`, `crypto`).
+## 🚀 Running the Application
 
 ```bash
 # In the project directory:
 node server.js
 ```
-Then open your browser at:
-`http://localhost:3000`
-
-### Method 2: Direct Browser Launch (Standalone Mode)
-You can also directly open `public/index.html` in any modern web browser. The application includes a resilient client-side fallback engine (`MockAiEngine`) and local storage persistence.
-
----
-
-## 🔌 API Specification
-
-### `POST /api/analyze-beauty-image`
-Accepts an image payload and returns structured cosmetic analysis data.
-
-**Request Payload:**
-```json
-{
-  "image": "data:image/jpeg;base64,...",
-  "questionnaire": {
-    "skinType": "Combination",
-    "mainConcern": "Hydration & Glow",
-    "sensitivity": "Mildly Sensitive"
-  },
-  "presetMode": null
-}
-```
-
-**Response (Success):**
-```json
-{
-  "success": true,
-  "analysisId": "scan_1727414400000",
-  "timestamp": "2026-09-27T10:50:00.000Z",
-  "overallScore": 82,
-  "categories": [
-    {
-      "key": "skinAppearance",
-      "title": "Skin Appearance",
-      "score": 85,
-      "observation": "Luminous, radiant overall appearance",
-      "confidence": "92% AI Estimate",
-      "simpleExplanation": "Evaluates visible skin reflectivity and clarity under ambient lighting.",
-      "suggestedApproach": "Maintain gentle antioxidant protection and light morning hydration."
-    }
-  ],
-  "faceShape": "Oval",
-  "hairAppearance": "Visible healthy brown hair",
-  "primaryCharacteristic": "Balanced skin appearance with localized superficial dehydration",
-  "recommendations": { ... },
-  "disclaimer": "IMPORTANT NON-MEDICAL NOTICE: Bio Beauty Nexus delivers cosmetic observations..."
-}
-```
-
-**Response (Poor Quality Rejection):**
-```json
-{
-  "success": false,
-  "errorType": "POOR_IMAGE_QUALITY",
-  "message": "The uploaded image appears blurred, underexposed, or does not clearly show facial features..."
-}
-```
-
-### Other Endpoints:
-- `GET /api/history` - Retrieve scan timeline history
-- `POST /api/assistant` - Conversational endpoint for beauty assistant
-- `GET /api/products` - Curated product & ingredient encyclopedia
-
----
-
-## 🔮 Connecting a Real AI / Computer Vision API
-
-To connect an external computer vision service (e.g. Google Cloud Vision API, Vertex AI, MediaPipe Face Mesh, or custom PyTorch/ONNX model):
-1. In `server.js`, locate the `analyzeBeautyImage` function.
-2. Replace or augment the pixel heuristic feature extraction with your remote model call:
-   ```javascript
-   // Example Vertex AI / Vision API call:
-   const response = await fetch('https://vision.googleapis.com/v1/images:annotate', {
-     method: 'POST',
-     headers: { 'Authorization': `Bearer ${process.env.GCP_TOKEN}` },
-     body: JSON.stringify({ ... })
-   });
-   ```
-3. Map the returned face landmarks, skin tone luminance, and texture variance into the established 7 cosmetic category format.
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.

@@ -7,40 +7,43 @@ import crypto from 'crypto';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
-const DB_FILE = path.join(__dirname, 'data', 'database.json');
+const DB_PATHS = [
+  path.join(__dirname, 'data', 'database.json'),
+  path.join(__dirname, 'bbn-backend', 'data', 'database.json')
+];
 
-// In-memory active session tokens map: token -> userId
-const SESSIONS = new Map();
-
-// Helper to hash password
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password || '').digest('hex');
-}
-
-// Helper to read and write database
 function getDatabase() {
-  try {
-    if (!fs.existsSync(DB_FILE)) {
-      return { users: [], ingredients: [], products: [], analysisHistory: [], hairAnalysisHistory: [] };
+  for (const dbPath of DB_PATHS) {
+    if (fs.existsSync(dbPath)) {
+      try {
+        const data = fs.readFileSync(dbPath, 'utf-8');
+        const parsed = JSON.parse(data);
+        if (!parsed.hairAnalysisHistory) parsed.hairAnalysisHistory = [];
+        if (!parsed.dietaryPlans) parsed.dietaryPlans = [];
+        if (!parsed.proposedRoutines) parsed.proposedRoutines = {};
+        return parsed;
+      } catch (err) {
+        console.error('Error reading database from ' + dbPath + ':', err);
+      }
     }
-    const data = fs.readFileSync(DB_FILE, 'utf-8');
-    const parsed = JSON.parse(data);
-    if (!parsed.hairAnalysisHistory) parsed.hairAnalysisHistory = [];
-    return parsed;
-  } catch (err) {
-    console.error('Error reading database:', err);
-    return { users: [], ingredients: [], products: [], analysisHistory: [], hairAnalysisHistory: [] };
   }
+  return { users: [], ingredients: [], products: [], analysisHistory: [], hairAnalysisHistory: [], dietaryPlans: [], proposedRoutines: {} };
 }
 
 function saveDatabase(db) {
-  try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf-8');
-    return true;
-  } catch (err) {
-    console.error('Error saving database:', err);
-    return false;
+  let saved = false;
+  const content = JSON.stringify(db, null, 2);
+  for (const dbPath of DB_PATHS) {
+    try {
+      const dir = path.dirname(dbPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(dbPath, content, 'utf-8');
+      saved = true;
+    } catch (err) {
+      console.error('Error saving database to ' + dbPath + ':', err);
+    }
   }
+  return saved;
 }
 
 // MIME types dictionary for static file serving
@@ -184,95 +187,75 @@ function analyzeBeautyImage(imageData, questionnaire = {}, presetMode = null) {
 
   const overallScore = Math.round(categories.reduce((acc, c) => acc + c.score, 0) / categories.length);
 
+  const db = getDatabase();
+
+  let routineKey = 'hydration_barrier';
+  let dietId = 'diet_skin_barrier_glow';
+
+  if (presetMode === 'dry' || hydrationScore < 60) {
+    routineKey = 'hydration_barrier';
+    dietId = 'diet_skin_barrier_glow';
+  } else if (presetMode === 'oily' || poresScore < 65) {
+    routineKey = 'sebum_clarifying';
+    dietId = 'diet_sebum_clarifying';
+  } else if (rednessScore < 70) {
+    routineKey = 'redness_calming';
+    dietId = 'diet_antioxidant_antiinflammatory';
+  } else if (textureScore < 75 || skinAppScore >= 85) {
+    routineKey = 'collagen_longevity';
+    dietId = 'diet_collagen_longevity';
+  }
+
+  const proposedRoutine = db.proposedRoutines?.[routineKey] || db.proposedRoutines?.hydration_barrier || {};
+  const matchedDietPlan = (db.dietaryPlans || []).find(d => d.id === dietId) || (db.dietaryPlans || [])[0] || null;
+
+  // Enrich step with real database product details
+  const enrichStepWithProduct = (step) => {
+    const product = (db.products || []).find(p => p.id === step.productId || p.name === step.name);
+    return {
+      ...step,
+      productId: step.productId || product?.id || null,
+      brand: product?.brand || 'Nexus Naturals',
+      price: product?.price || '$36',
+      keyIngredients: product?.keyIngredients || [],
+      howToUse: product?.howToUse || step.instruction,
+      skinFit: product?.skinFit || ''
+    };
+  };
+
+  const morningRoutine = (proposedRoutine.morningRoutine || []).map(enrichStepWithProduct);
+  const eveningRoutine = (proposedRoutine.eveningRoutine || []).map(enrichStepWithProduct);
+  const weeklyRoutine = (proposedRoutine.weeklyRoutine || []).map(enrichStepWithProduct);
+
+  // Extract unique database products associated with this routine
+  const proposedProductIds = new Set([
+    ...morningRoutine.map(s => s.productId),
+    ...eveningRoutine.map(s => s.productId),
+    ...weeklyRoutine.map(s => s.productId)
+  ].filter(Boolean));
+
+  const proposedProducts = (db.products || []).filter(p => proposedProductIds.has(p.id));
+
+  // Extract pure natural ingredients
+  const ingredientSuggestions = (db.ingredients || []).slice(0, 4).map(ing => ({
+    name: ing.name,
+    role: ing.category,
+    origin: ing.origin,
+    why: ing.benefits,
+    isNatural: ing.isNatural
+  }));
+
   const recommendations = {
     summary: `Based on your AI Beauty Scan, your cosmetic profile shows ${primaryCharacteristic.toLowerCase()}. Your personalized protocol focuses on reinforcing barrier comfort, optimizing moisture retention, and refining surface radiance.`,
-    morningRoutine: [
-      {
-        step: 1,
-        title: 'Purify',
-        category: 'Gentle Cleanser',
-        name: hydrationScore < 60 ? 'Bio-Adaptive Phyto Cleansing Milk' : 'Clarifying Botanical Amino Gel Cleanser',
-        instruction: 'Massage with lukewarm water for 45 seconds to refresh your complexion without stripping natural lipids.'
-      },
-      {
-        step: 2,
-        title: 'Hydrate & Prep',
-        category: 'Hydrating Essence',
-        name: 'Cellular Hydration Micro-Essence',
-        instruction: 'Pat gently onto damp skin to flood skin layers with multi-molecular hyaluronic acid.'
-      },
-      {
-        step: 3,
-        title: 'Target & Refine',
-        category: 'Targeted Serum',
-        name: 'Pore Refine & Radiance Serum (5% Niacinamide + PAD)',
-        instruction: 'Press 3 drops into T-zone and areas with visible redness or tone variation.'
-      },
-      {
-        step: 4,
-        title: 'Protect & Shield',
-        category: 'Mineral SPF 50+',
-        name: 'Bio-Shield Invisible Mineral Fluid SPF 50+',
-        instruction: 'Apply two finger-lengths as the crucial final shield against UV-induced premature skin changes.'
-      }
-    ],
-    eveningRoutine: [
-      {
-        step: 1,
-        title: 'Double Cleanse',
-        category: 'Micellar / Botanical Oil',
-        name: 'Bio-Adaptive Phyto Cleansing Milk',
-        instruction: 'Dissolve daily sunscreen and environmental airborne particulates gently.'
-      },
-      {
-        step: 2,
-        title: 'Orbital Awakening',
-        category: 'Eye Hydrogel',
-        name: 'Orbital Bio-Awaken Eye Hydrogel',
-        instruction: 'Tap gently along the orbital bone using your ring finger to soothe under-eye shadows.'
-      },
-      {
-        step: 3,
-        title: 'Barrier Restoration',
-        category: 'Rich Moisturizer',
-        name: 'Bio-Regenerative Barrier Cream (Ceramides + Squalane)',
-        instruction: 'Warm between fingertips and smooth across face and neck to seal in restorative nighttime hydration.'
-      }
-    ],
-    weeklyRoutine: [
-      {
-        frequency: '1-2 times weekly',
-        title: 'Gentle Enzymatic Renewal Mask',
-        description: 'Dissolves dull surface buildup without abrasive scrubbing, restoring touchable smoothness.'
-      },
-      {
-        frequency: '2 times weekly',
-        title: 'Deep Moisture Recovery Sheet Treatment',
-        description: 'Immerses skin in Centella Asiatica and Panthenol to calm visible redness and replenish moisture reserves.'
-      }
-    ],
-    ingredientSuggestions: [
-      {
-        name: 'Multi-Molecular Hyaluronic Acid',
-        role: 'Deep Hydration Anchor',
-        why: 'Draws moisture into multiple epidermal layers, smoothing the look of fine dehydration lines.'
-      },
-      {
-        name: 'Ceramide Complex (NP, AP, EOP)',
-        role: 'Lipid Barrier Sealant',
-        why: 'Replenishes natural intercellular cement, dramatically reducing flaky texture and moisture loss.'
-      },
-      {
-        name: 'Centella Asiatica (Cica)',
-        role: 'Botanical Redness Soother',
-        why: 'Rapidly tempers visible flush and promotes resilient skin equilibrium.'
-      },
-      {
-        name: 'Niacinamide (Vitamin B3 2-5%)',
-        role: 'Pore & Tone Harmonizer',
-        why: 'Visibly reduces pore diameter appearance and evens superficial cosmetic discoloration.'
-      }
-    ],
+    routineId: proposedRoutine.id || routineKey,
+    routineName: proposedRoutine.name || 'Personalized Bio Beauty Protocol',
+    routineFocus: proposedRoutine.focus || primaryCharacteristic,
+    morningRoutine,
+    eveningRoutine,
+    weeklyRoutine,
+    proposedProducts,
+    dietaryPlan: matchedDietPlan,
+    ingredientSuggestions,
     productCategories: [
       { category: 'Gentle Cleanser', focus: 'pH-balanced non-foaming surfactant' },
       { category: 'Humectant Serum', focus: 'Multi-molecular hyaluronic acid + glycerin' },
@@ -437,6 +420,221 @@ function analyzeHairImage(imageData, questionnaire = {}, presetMode = null) {
   };
 }
 
+// AI Hair Analysis by Questionnaire Calculation
+function analyzeHairQuestionnaire(q = {}) {
+  const pattern = q.hairPattern || 'Type 2 Wavy';
+  const thickness = q.strandThickness || 'Medium';
+  const density = q.hairDensity || 'Medium';
+  const scalp = q.scalpType || 'Balanced / Normal';
+  const porosity = q.porosity || 'Medium Porosity';
+  const goal = q.primaryGoal || 'Frizz Control & Smooth Cuticles';
+  const processing = q.chemicalProcessing || 'Virgin hair';
+  const washFreq = q.washFrequency || '2-3 times per week';
+
+  // Density score calculation
+  let densityScore = density === 'High / Dense' ? 90 : (density === 'Medium' ? 78 : 62);
+  
+  // Texture score calculation
+  let textureScore = 80;
+  if (pattern.includes('Type 1')) textureScore = 85;
+  else if (pattern.includes('Type 2')) textureScore = 78;
+  else if (pattern.includes('Type 3')) textureScore = 74;
+  else if (pattern.includes('Type 4')) textureScore = 70;
+
+  // Shine & Porosity score
+  let shineScore = 75;
+  if (porosity.includes('High') || processing.includes('Highlight') || processing.includes('heat')) shineScore = 58;
+  else if (porosity.includes('Low')) shineScore = 84;
+  else shineScore = 79;
+
+  // Scalp Comfort score
+  let scalpScore = 82;
+  if (scalp.includes('Dry') || scalp.includes('Tight')) scalpScore = 60;
+  else if (scalp.includes('Oily')) scalpScore = 64;
+  else if (scalp.includes('Sensitive') || scalp.includes('Reactive')) scalpScore = 58;
+  else scalpScore = 88;
+
+  // Frizz Control score
+  let frizzScore = 74;
+  if (goal.includes('Frizz') || porosity.includes('High') || pattern.includes('Curly') || pattern.includes('Wavy')) frizzScore = 60;
+  if (processing.includes('Virgin') && porosity.includes('Medium')) frizzScore = 84;
+
+  const clamp = (v) => Math.min(96, Math.max(45, Math.round(v)));
+
+  // Natural Botanical Ingredients from database matched to questionnaire profile
+  const naturalIngredients = [];
+  if (densityScore < 80 || goal.includes('Density') || goal.includes('Thinning')) {
+    naturalIngredients.push({
+      name: 'Rosemary Leaf Extract & Essential Oil',
+      origin: '100% Pure Botanical',
+      role: 'Follicle Stimulator & Root Tonic',
+      why: 'Rich in carnosic acid; enhances micro-circulation at the root to improve visible strand density and invigorate sluggish hair follicles.'
+    });
+    naturalIngredients.push({
+      name: 'Organic Amla & Bhringraj',
+      origin: 'Ayurvedic Herbal Blend',
+      role: 'Ayurvedic Density & Cortex Fortifier',
+      why: 'Packed with natural tannins and bio-Vitamin C that fortify hair shafts from within, enhancing rich natural color and hair bounce.'
+    });
+  }
+
+  if (frizzScore < 75 || porosity.includes('High') || pattern.includes('Curly') || goal.includes('Frizz')) {
+    naturalIngredients.push({
+      name: 'Cold-Pressed Virgin Argan Oil',
+      origin: '100% Pure Moroccan Oil',
+      role: 'Lipid Cuticle Sealant & Mirror Gloss',
+      why: 'Oleic and linoleic essential fatty acids coat each hair strand in a weightless natural shield that blocks out humidity-induced frizz.'
+    });
+    naturalIngredients.push({
+      name: 'Fermented Rice Water & Hibiscus',
+      origin: 'Bio-Fermented Botanical',
+      role: 'Tensile Strength & Cuticle Repair',
+      why: 'Natural inositol and plant alpha-hydroxy acids penetrate porous strands, smoothing jagged cuticles and defining natural waves/curls.'
+    });
+  }
+
+  if (scalpScore < 75 || scalp.includes('Oily') || scalp.includes('Dry') || scalp.includes('Flakes')) {
+    naturalIngredients.push({
+      name: 'Organic Aloe Vera & Tea Tree Hydrosol',
+      origin: 'Purifying Plant Complex',
+      role: 'Scalp Balancing & Flake Relief',
+      why: 'Proteolytic enzymes dissolve dead keratin buildup while steam-distilled tea tree purifies the scalp without disturbing its natural moisture barrier.'
+    });
+    naturalIngredients.push({
+      name: 'Golden Cold-Pressed Jojoba Oil',
+      origin: 'Biomimetic Liquid Wax',
+      role: 'Sebum Harmonizer & Follicle Unclogger',
+      why: 'Biomimetic plant liquid wax that dissolves hardened root sebum and calms tightness or excess oiliness.'
+    });
+  }
+
+  if (naturalIngredients.length < 3) {
+    naturalIngredients.push({
+      name: '100% Olive-Derived Plant Squalane',
+      origin: 'Mediterranean Botanical Lipid',
+      role: 'Featherweight Moisture & Silk Finish',
+      why: 'Ultra-lightweight natural lipid that imparts high-gloss shine and silky slip without weighing down fine or medium strands.'
+    });
+  }
+
+  const categories = [
+    {
+      key: 'hairDensity',
+      title: 'Hair Density & Root Vitality',
+      score: clamp(densityScore),
+      observation: densityScore > 80 ? 'Abundant, robust root coverage' : (densityScore > 70 ? 'Moderate follicle distribution' : 'Delicate strand volume with high scalp visibility'),
+      confidence: '95% Questionnaire Calibration',
+      simpleExplanation: `Calculated from your self-reported ${density.toLowerCase()} and ponytail circumference.`,
+      suggestedApproach: 'Warm 2 droppers of pure Rosemary & Amla scalp nectar into root partings 3 nights a week.'
+    },
+    {
+      key: 'hairTexture',
+      title: 'Pattern & Fiber Micro-Relief',
+      score: clamp(textureScore),
+      observation: `${pattern} with ${thickness.toLowerCase()} fiber diameter`,
+      confidence: '96% Questionnaire Calibration',
+      simpleExplanation: 'Identifies cuticle shape and how fibers group together.',
+      suggestedApproach: 'Use sulfate-free herbal cleansers; detangle exclusively with wide-tooth wooden combs on wet conditioned hair.'
+    },
+    {
+      key: 'hairShine',
+      title: 'Moisture Lustre & Cuticle Porosity',
+      score: clamp(shineScore),
+      observation: porosity.includes('High') ? 'Elevated porosity with rapid moisture loss' : 'Balanced moisture retention and healthy specular light reflection',
+      confidence: '94% Questionnaire Calibration',
+      simpleExplanation: `Your ${porosity.toLowerCase()} dictates how readily cuticles absorb and release water.`,
+      suggestedApproach: 'Seal wet ends with 2-3 drops of Cold-Pressed Argan and Olive Squalane.'
+    },
+    {
+      key: 'scalpComfort',
+      title: 'Scalp Barrier Comfort',
+      score: clamp(scalpScore),
+      observation: scalpScore < 70 ? `${scalp} with tendency towards irritation or imbalance` : 'Calm, balanced scalp environment',
+      confidence: '92% Questionnaire Calibration',
+      simpleExplanation: 'Evaluates sebum production, tight sensations, and root breathability.',
+      suggestedApproach: 'Apply Organic Aloe Vera gel and gentle Jojoba pre-wash scalp massage.'
+    },
+    {
+      key: 'frizzControl',
+      title: 'Frizz Index & Cuticle Alignment',
+      score: clamp(frizzScore),
+      observation: frizzScore < 70 ? 'Disrupted cuticle alignment and elevated halo flyaways' : 'Smooth, cohesive strand alignment',
+      confidence: '93% Questionnaire Calibration',
+      simpleExplanation: 'Reflects humidity absorption and cuticle smoothness along mid-lengths.',
+      suggestedApproach: 'Incorporate weekly Fermented Rice Water & Hibiscus mask treatment.'
+    }
+  ];
+
+  const overallScore = Math.round(categories.reduce((acc, c) => acc + c.score, 0) / categories.length);
+
+  return {
+    success: true,
+    analysisId: 'hair_q_' + Date.now(),
+    analysisType: 'questionnaire',
+    timestamp: new Date().toISOString(),
+    overallScore,
+    hairTypeLabel: `${pattern} • ${porosity}`,
+    primaryCharacteristic: `Custom questionnaire profile: ${pattern} with ${porosity.toLowerCase()} and ${scalp.toLowerCase()} scalp`,
+    categories,
+    recommendations: {
+      summary: `Based on your Hair Questionnaire, your natural profile indicates ${pattern.toLowerCase()} with ${porosity.toLowerCase()}. We have formulated a 100% natural, botanical ritual focused on root vitality, natural cuticle sealing, and scalp microbiome balance.`,
+      proposedProducts: (getDatabase().products || []).filter(p => p.id.startsWith('prod_hair_')),
+      dietaryPlan: (getDatabase().dietaryPlans || []).find(d => d.id === 'diet_hair_follicle_vitality') || (getDatabase().dietaryPlans || [])[0],
+      washDayRoutine: [
+        {
+          step: 1,
+          title: 'Pre-Wash Herbal Scalp Oil Massage',
+          productId: 'prod_hair_01',
+          product: 'Ayurvedic Amla, Rosemary & Bhringraj Scalp Nectar',
+          brand: 'Nexus Naturals',
+          price: '$38',
+          instruction: 'Warm 1-2 droppers between fingertips. Massage into scalp partings for 3-5 minutes before washing to stimulate micro-circulation.'
+        },
+        {
+          step: 2,
+          title: 'Gentle Botanical Cleanse',
+          productId: 'prod_hair_04',
+          product: 'Tea Tree & Aloe Vera Scalp Clarifying Elixir',
+          brand: 'Nexus Naturals',
+          price: '$28',
+          instruction: 'Apply directly to wet roots to dissolve sebum buildup and soothe the scalp without stripping natural lipids.'
+        },
+        {
+          step: 3,
+          title: 'Deep Plant Mask & Cuticle Bond Seal',
+          productId: 'prod_hair_02',
+          product: 'Fermented Rice Water & Hibiscus Curl Recovery Mask',
+          brand: 'Nexus Naturals',
+          price: '$36',
+          instruction: 'Rake generously through damp mid-lengths to ends. Detangle gently and rinse with cool water after 10 minutes.'
+        }
+      ],
+      dailyCareRoutine: [
+        {
+          step: 1,
+          title: 'Nightly Scalp Tonic Drops',
+          productId: 'prod_hair_01',
+          product: 'Ayurvedic Amla, Rosemary & Bhringraj Scalp Nectar',
+          brand: 'Nexus Naturals',
+          price: '$38',
+          instruction: 'Mist or drop onto clean scalp along partings before bed; lightly press with pads of your fingers.'
+        },
+        {
+          step: 2,
+          title: 'Daily Cuticle Sealant & Shine Drops',
+          productId: 'prod_hair_03',
+          product: 'Cold-Pressed Argan & Olive Squalane Silk Drops',
+          brand: 'Nexus Naturals',
+          price: '$32',
+          instruction: 'Smooth 2 drops over damp or dry ends to eliminate frizz and shield against atmospheric humidity.'
+        }
+      ],
+      ingredientSuggestions: naturalIngredients
+    },
+    disclaimer: 'IMPORTANT NON-MEDICAL HAIR ADVISORY: This questionnaire provides cosmetic observations and natural grooming guidance based on your self-reported hair and scalp characteristics. It is NOT a clinical diagnosis for alopecia, telogen effluvium, psoriasis, or trichological disorders. Consult a licensed dermatologist or trichologist for medical conditions.'
+  };
+}
+
 // AI Beauty Assistant response generator
 function generateAssistantReply(question, contextAnalysis = null) {
   const q = (question || '').toLowerCase();
@@ -464,11 +662,15 @@ function generateAssistantReply(question, contextAnalysis = null) {
     return `### Decoding Skin Texture 🔍\n\nVisible skin texture reflects the surface smoothness and micro-relief of your skin. To refine texture safely:\n- Do not over-scrub with harsh physical scrubs.\n- Use gentle PHAs or enzyme exfoliants 1-2 times weekly.\n- Apply barrier-reinforcing ceramides and peptides.`;
   }
 
-  if (q.includes('improve') || q.includes('improve my beauty routine')) {
-    return `### 5 High-Impact Skincare Habits ✨\n\n1. Apply hydrators on **damp skin**.\n2. **Double cleanse** at night.\n3. Wear **SPF 50+ daily**, rain or shine.\n4. Change pillowcases every 3-4 days.\n5. Consistency over complexity: stick to your routine for 4-6 weeks to see results!`;
+  if (q.includes('diet') || q.includes('food') || q.includes('nutrition') || q.includes('eat') || q.includes('superfood') || q.includes('recipe') || q.includes('meal')) {
+    return `### Personalized Beauty & Hair Dietary Protocol 🥗\n\nNutritional support fuels cellular skin renewal and follicular strength from the inside out:\n\n- **Skin Barrier Hydration**: Consume Omega-3 rich foods (wild salmon, chia seeds, walnuts) and healthy monounsaturated fats (avocados, extra virgin olive oil) to lock in epidermal lipids.\n- **Hair Follicle Biomass**: Ensure adequate zinc (pumpkin seeds, lentils) and silica/antioxidants (amla, rosemary teas) to support active anagen hair growth.\n- **Collagen & Elasticity Defense**: Fuel lysyl oxidase enzymes with natural bioavailable Vitamin C (camu camu, berries, bell peppers) and Tremella snow mushroom polysaccharides.\n- **Sebum & Redness Harmony**: Sip organic spearmint tea and matcha green tea to curb oxidative sebum stress.\n\n*Check the **Dietary Plan** tab in your top navigation for your full meal schedule!*`;
   }
 
-  return `### Beauty Assistant Insight\n\nThank you for asking! Bio Beauty Nexus provides non-medical cosmetic guidance for skin and hair care.\n\nYou can ask me:\n- **"Build me a morning routine"**\n- **"What does my analysis mean?"**\n- **"Which ingredients should I look for?"**\n- **"How do I improve frizzy hair and scalp health?"**`;
+  if (q.includes('product') || q.includes('database') || q.includes('nexus naturals') || q.includes('proposed')) {
+    return `### Proposed Nexus Naturals Database Formulations 🌿\n\nYour routine directly matches our clean botanical database formulas:\n\n- **Cleansers**: *Clarifying Botanical Amino Gel Cleanser* (White willow bark + green tea)\n- **Essences**: *Cellular Hydration Micro-Essence* (Tremella mushroom + fermented rice water)\n- **Serums**: *Pore Refine & Radiance Phyto-Serum* (5% Niacinamide + Cica)\n- **Barrier Creams**: *Bio-Regenerative Ceramide Recovery Balm* (Ceramides + Olive Squalane)\n- **Hair & Scalp**: *Ayurvedic Amla, Rosemary & Bhringraj Scalp Nectar* and *Fermented Rice Water Mask*\n\n*All formulas are 100% plant-based, non-comedogenic, and silicone-free!*`;
+  }
+
+  return `### Beauty Assistant Insight\n\nThank you for asking! Bio Beauty Nexus provides non-medical cosmetic guidance for skin and hair care.\n\nYou can ask me:\n- **"Build me a morning routine"**\n- **"What dietary plan should I follow?"**\n- **"What does my analysis mean?"**\n- **"Which ingredients should I look for?"**\n- **"How do I improve frizzy hair and scalp health?"**`;
 }
 
 // Create HTTP server
@@ -609,7 +811,8 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/analyze-beauty-image' && req.method === 'POST') {
     parseJsonBody((err, payload) => {
       try {
-        const result = analyzeBeautyImage(payload.image, payload.questionnaire, payload.presetMode);
+        const img = payload.image || payload.imageData;
+        const result = analyzeBeautyImage(img, payload.questionnaire, payload.presetMode);
         if (result.success) {
           const db = getDatabase();
           const historyEntry = {
@@ -649,7 +852,8 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/analyze-hair' && req.method === 'POST') {
     parseJsonBody((err, payload) => {
       try {
-        const result = analyzeHairImage(payload.image, payload.questionnaire, payload.presetMode);
+        const img = payload.image || payload.imageData;
+        const result = analyzeHairImage(img, payload.questionnaire, payload.presetMode);
         if (result.success) {
           const db = getDatabase();
           db.hairAnalysisHistory.push(result);
@@ -660,6 +864,26 @@ const server = http.createServer((req, res) => {
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, error: 'Error analyzing hair image' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/analyze-hair-questionnaire' && req.method === 'POST') {
+    parseJsonBody((err, payload) => {
+      try {
+        const result = analyzeHairQuestionnaire(payload.questionnaire || payload);
+        if (result.success) {
+          const db = getDatabase();
+          db.hairAnalysisHistory.push(result);
+          saveDatabase(db);
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        console.error('Error analyzing hair questionnaire:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'Error analyzing hair questionnaire' }));
       }
     });
     return;
@@ -688,10 +912,28 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Static file serving from public/ directory
-  let filePath = path.join(__dirname, 'public', pathname === '/' ? 'index.html' : pathname);
+  if (pathname === '/api/dietary-plans' && req.method === 'GET') {
+    const db = getDatabase();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, dietaryPlans: db.dietaryPlans }));
+    return;
+  }
+
+  if (pathname === '/api/proposed-routines' && req.method === 'GET') {
+    const db = getDatabase();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, proposedRoutines: db.proposedRoutines }));
+    return;
+  }
+
+  // Static file serving from bbn-frontend/ (or public/) directory
+  const staticRoot = fs.existsSync(path.join(__dirname, 'bbn-frontend'))
+    ? path.join(__dirname, 'bbn-frontend')
+    : path.join(__dirname, 'public');
+
+  let filePath = path.join(staticRoot, pathname === '/' ? 'index.html' : pathname);
   
-  if (!filePath.startsWith(path.join(__dirname, 'public'))) {
+  if (!filePath.startsWith(staticRoot)) {
     res.writeHead(403, { 'Content-Type': 'text/plain' });
     res.end('Access Denied');
     return;
@@ -699,13 +941,16 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      const indexPath = path.join(__dirname, 'public', 'index.html');
+      const indexPath = path.join(staticRoot, 'index.html');
       fs.readFile(indexPath, (readErr, content) => {
         if (readErr) {
           res.writeHead(404, { 'Content-Type': 'text/plain' });
           res.end('404 Not Found');
         } else {
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+          res.writeHead(200, { 
+            'Content-Type': 'text/html; charset=UTF-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          });
           res.end(content);
         }
       });
@@ -720,7 +965,10 @@ const server = http.createServer((req, res) => {
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Server Error Reading File');
       } else {
-        res.writeHead(200, { 'Content-Type': contentType });
+        res.writeHead(200, { 
+          'Content-Type': contentType,
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        });
         res.end(content);
       }
     });

@@ -1,9 +1,10 @@
 import { DEMO_PRESETS, HAIR_DEMO_PRESETS } from '../demoPresets.js';
 
 export class ImageUpload {
-  constructor({ onImageSelected, onError, initialMode = 'skin' }) {
+  constructor({ onImageSelected, onError, onOpenHairQuiz, initialMode = 'skin' }) {
     this.onImageSelected = onImageSelected;
     this.onError = onError;
+    this.onOpenHairQuiz = onOpenHairQuiz;
     this.scanType = initialMode; // 'skin' or 'hair'
     this.videoStream = null;
     this.isCameraActive = false;
@@ -33,16 +34,32 @@ export class ImageUpload {
         </button>
       </div>
 
+      <!-- Hair Questionnaire Callout when in hair mode -->
+      ${!isSkin ? `
+        <div class="hair-quiz-callout-banner glass-panel">
+          <div class="callout-left">
+            <span class="callout-icon">📝</span>
+            <div>
+              <strong>Prefer not to take a photo?</strong>
+              <p>Complete our 8-step Hair & Scalp Questionnaire to formulate your 100% natural botanical routine.</p>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" id="btnLaunchHairQuizInline">
+            Take Hair Questionnaire
+          </button>
+        </div>
+      ` : ''}
+
       <div class="upload-header">
-        <div class="bio-badge">
-          <span class="pulse-dot"></span>
+        <div class="bio-badge ${!isSkin ? 'hair-badge' : ''}">
+          <span class="pulse-dot ${!isSkin ? 'hair-pulse-dot' : ''}"></span>
           ${isSkin ? 'AI FACIAL SCANNER v2.6' : 'AI HAIR & SCALP SCANNER v2.6'}
         </div>
         <h2 class="upload-title">${isSkin ? 'Capture or Upload Your Face Image' : 'Capture or Upload Your Hair & Scalp'}</h2>
         <p class="upload-subtitle">
           ${isSkin 
             ? 'Ensure good, balanced lighting facing the camera with a neutral facial expression for optimal cosmetic feature extraction.'
-            : 'Capture a clear, well-lit photo showing your hair texture, crown parting, or lengths to analyze density, shine, and cuticle alignment.'}
+            : 'Capture a clear photo of your hair parting, crown, or lengths in good lighting to analyze density, shine, and cuticle alignment.'}
         </p>
       </div>
 
@@ -107,7 +124,7 @@ export class ImageUpload {
       <!-- Demo Presets Section -->
       <div class="demo-presets-section">
         <div class="presets-header">
-          <span class="presets-tag">${isSkin ? 'Skin Demo Cases' : 'Hair Demo Cases'}</span>
+          <span class="presets-tag ${!isSkin ? 'hair-presets-tag' : ''}">${isSkin ? 'Skin Demo Cases' : 'Hair Demo Cases'}</span>
           <span>Don't have a photo ready? Try one of our instant calibrated test profiles:</span>
         </div>
         <div class="preset-chips-grid" id="presetChipsGrid"></div>
@@ -129,6 +146,7 @@ export class ImageUpload {
   }
 
   attachEvents(container, presets) {
+    const isSkin = this.scanType === 'skin';
     const fileInput = container.querySelector('#fileInput');
     const dropzone = container.querySelector('#dropzoneContainer');
     const btnUploadFile = container.querySelector('#btnUploadFile');
@@ -141,6 +159,7 @@ export class ImageUpload {
 
     const toggleSkin = container.querySelector('#toggleModeSkin');
     const toggleHair = container.querySelector('#toggleModeHair');
+    const btnHairQuiz = container.querySelector('#btnLaunchHairQuizInline');
 
     toggleSkin.addEventListener('click', () => {
       this.scanType = 'skin';
@@ -151,6 +170,12 @@ export class ImageUpload {
       this.scanType = 'hair';
       this.updateUploadCard(container);
     });
+
+    if (btnHairQuiz) {
+      btnHairQuiz.addEventListener('click', () => {
+        if (this.onOpenHairQuiz) this.onOpenHairQuiz();
+      });
+    }
 
     btnUploadFile.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('click', (e) => {
@@ -254,7 +279,7 @@ export class ImageUpload {
           <img src="${preset.image}" alt="${preset.title}" />
         </div>
         <div class="preset-info">
-          <span class="preset-badge">${preset.badge}</span>
+          <span class="preset-badge ${!isSkin ? 'hair-badge-text' : ''}">${preset.badge}</span>
           <span class="preset-name">${preset.title}</span>
           <span class="preset-desc">${preset.subtitle}</span>
         </div>
