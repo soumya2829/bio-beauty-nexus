@@ -37,17 +37,14 @@ export class AuthModal {
           <form id="loginForm" class="${this.activeMode === 'login' ? '' : 'hidden'}">
             <div class="form-group">
               <label for="loginEmail">Email Address</label>
-              <input type="email" id="loginEmail" class="form-input" placeholder="alex.chen@biobeautynexus.io" required value="alex.chen@biobeautynexus.io" />
+              <input type="email" id="loginEmail" class="form-input" placeholder="Enter your email address" autocomplete="off" />
             </div>
 
             <div class="form-group">
               <label for="loginPassword">Password</label>
-              <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required value="password123" />
+              <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" autocomplete="new-password" />
             </div>
 
-            <div class="demo-auth-hint">
-              <span>💡 Demo account ready: <strong>alex.chen@biobeautynexus.io</strong> (password: <strong>password123</strong>)</span>
-            </div>
 
             <button type="submit" class="btn btn-primary btn-block" id="btnSubmitLogin">
               Sign In to Bio Nexus

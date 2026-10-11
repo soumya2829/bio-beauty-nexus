@@ -83,16 +83,10 @@ export const API = {
       }
       return { success: false, error: data.error || 'Login failed' };
     } catch (e) {
-      // Local fallback login
-      const user = {
-        id: 'usr_local',
-        name: email.split('@')[0] || 'Beauty Member',
-        email,
-        skinType: 'Combination',
-        hairType: 'Wavy'
-      };
-      localStorage.setItem(LOCAL_STORAGE_AUTH_KEY, JSON.stringify(user));
-      return { success: true, user };
+      return{
+        success: false,
+        error: 'Login failed due to network issues. Please try again later.'
+      }
     }
   },
 
@@ -110,16 +104,10 @@ export const API = {
       }
       return { success: false, error: data.error || 'Registration failed' };
     } catch (e) {
-      // Local fallback register
-      const user = {
-        id: 'usr_' + Date.now(),
-        name: userData.name,
-        email: userData.email,
-        skinType: userData.skinType || 'Combination',
-        hairType: userData.hairType || 'Wavy'
-      };
-      localStorage.setItem(LOCAL_STORAGE_AUTH_KEY, JSON.stringify(user));
-      return { success: true, user };
+      return{
+        success: false,
+        error: 'Registration failed due to network issues. Please try again later.'
+        }
     }
   },
 
@@ -128,16 +116,7 @@ export const API = {
     if (raw) {
       try { return JSON.parse(raw); } catch (e) {}
     }
-    // Default demo user logged in
-    const defaultUser = {
-      id: "usr_demo_01",
-      name: "Alex Chen",
-      email: "alex.chen@biobeautynexus.io",
-      skinType: "Combination",
-      hairType: "Wavy / Medium Density"
-    };
-    localStorage.setItem(LOCAL_STORAGE_AUTH_KEY, JSON.stringify(defaultUser));
-    return defaultUser;
+    return null;
   },
 
   logout() {
