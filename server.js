@@ -7,10 +7,17 @@ import crypto from 'crypto';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
+const SESSIONS=new Map();
 const DB_PATHS = [
   path.join(__dirname, 'data', 'database.json'),
   path.join(__dirname, 'bbn-backend', 'data', 'database.json')
 ];
+function hashPassword(password) {
+  return crypto
+    .createHash('sha256')
+    .update(password, 'utf8')
+    .digest('hex');
+}
 
 function getDatabase() {
   for (const dbPath of DB_PATHS) {
@@ -690,23 +697,39 @@ const server = http.createServer((req, res) => {
 
   // Helper to parse JSON body
   const parseJsonBody = (callback) => {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const payload = JSON.parse(body || '{}');
-        callback(null, payload);
-      } catch (err) {
-        callback(err, null);
-      }
-    });
-  };
+  let body = '';
+
+  req.on('data', (chunk) => {
+    body += chunk.toString();
+  });
+
+  req.on('end', () => {
+    try {
+      const payload = body.trim()
+        ? JSON.parse(body)
+        : {};
+
+      callback(null, payload);
+    } catch (err) {
+      callback(err, null);
+    }
+  });
+
+  req.on('error', (err) => {
+    callback(err, null);
+  });
+};
 
   // ----------------------------------------------------
   // AUTH ENDPOINTS: Register, Login, Me
   // ----------------------------------------------------
   if (pathname === '/api/auth/register' && req.method === 'POST') {
     parseJsonBody((err, payload) => {
+      console.log('REGISTER REQUEST:', {
+  contentType: req.headers['content-type'],
+  parseError: err ? err.message : null,
+  payloadType: typeof payload
+});
       if (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, error: 'Invalid JSON payload' }));
